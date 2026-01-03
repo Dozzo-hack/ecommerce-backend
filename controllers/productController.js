@@ -40,6 +40,33 @@ exports.getProducts = async (req, res) => {
     res.status(500).json({ message: "Erreur interne du serveur" });
   }
 };
+// backend - products.controller.js
+exports.getProducts = async (req, res) => {
+  try {
+    const { category, search } = req.query;
+
+    let filter = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const products = await Product.find(filter);
+    res.json(products);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
 
 // ==========================
 // UPDATE PRODUCT
